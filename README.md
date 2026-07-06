@@ -272,10 +272,10 @@ streamlit run app.py
 **Srikar Sai Tej**
 
 GitHub:
-https://github.com/<YOUR_GITHUB_USERNAME>
+https://github.com/Srikarsaitej
 
 LinkedIn:
-<YOUR_LINKEDIN_URL>
+https://www.linkedin.com/in/srikar-sai/
 
 ---
 
