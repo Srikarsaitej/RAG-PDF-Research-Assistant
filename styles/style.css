@@ -1,0 +1,53 @@
+/* ---------- Main App ---------- */
+
+.main {
+    background-color: #f8fafc;
+}
+
+/* ---------- Sidebar ---------- */
+
+section[data-testid="stSidebar"] {
+    background-color: #ffffff;
+}
+
+/* ---------- Dashboard Cards ---------- */
+
+.card {
+    background: white;
+    border-radius: 15px;
+    padding: 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border-left: 5px solid #2563eb;
+}
+
+.card h3 {
+    margin-top: 0;
+    color: #2563eb;
+}
+
+.card p {
+    margin: 8px 0;
+    font-size: 15px;
+}
+
+/* ---------- Chat ---------- */
+
+.stChatMessage {
+    border-radius: 15px;
+}
+
+/* ---------- Buttons ---------- */
+
+.stButton>button {
+    width: 100%;
+    border-radius: 10px;
+    height: 45px;
+    font-weight: bold;
+}
+
+/* ---------- Upload ---------- */
+
+.stFileUploader {
+    border-radius: 12px;
+}
