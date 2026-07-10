@@ -6,6 +6,10 @@ from utils.embeddings import get_embedding_model
 from utils.vector_store import create_vector_store
 from utils.rag_pipeline import create_rag_chain
 
+from utils.router import is_summary_request
+from utils.summarizer import summarize_document
+
+from utils.document_insights import generate_document_insights
 
 # ==========================================================
 # PAGE CONFIG
@@ -54,8 +58,14 @@ if "file_name" not in st.session_state:
 if "pages" not in st.session_state:
     st.session_state.pages = 0
 
-if "chunks" not in st.session_state:
-    st.session_state.chunks = 0
+if "chunk_count" not in st.session_state:
+    st.session_state.chunk_count = 0
+
+if "document_chunks" not in st.session_state:
+    st.session_state.document_chunks = []
+
+if "document_insights" not in st.session_state:
+    st.session_state.document_insights = ""
 
 
 
@@ -77,7 +87,7 @@ if st.session_state.pdf_loaded:
 
     c1.metric("📄 Pages", st.session_state.pages)
 
-    c2.metric("✂ Chunks", st.session_state.chunks)
+    c2.metric("✂ Chunks", st.session_state.chunk_count)
 
     c3.metric("🤖 Model", "Llama3.2")
 
@@ -116,11 +126,21 @@ with st.sidebar:
 
         documents = load_pdf("temp.pdf")
 
+        from utils.cleaner import clean_documents
+
+        documents = clean_documents(documents)
+
         status.info("✂ Splitting document...")
 
         progress.progress(30)
 
         chunks = split_documents(documents)
+
+        # Store chunks for summarization
+        st.session_state.document_chunks = chunks
+
+        # Store chunk count for sidebar
+        st.session_state.chunk_count = len(chunks)
 
         status.info("🧠 Loading embedding model...")
 
@@ -142,12 +162,18 @@ with st.sidebar:
         progress.progress(90)
 
         retriever = vector_store.as_retriever(
-            search_kwargs={"k": 3}
+            search_type="mmr",
+            search_kwargs={
+                "k": 6,
+                "fetch_k": 20
+            }
         )
 
         st.session_state.rag_chain = create_rag_chain(
             retriever
         )
+
+        st.session_state.document_insights = generate_document_insights(chunks)
 
         progress.progress(100)
 
@@ -155,7 +181,7 @@ with st.sidebar:
 
         st.session_state.file_name = uploaded_file.name
         st.session_state.pages = len(documents)
-        st.session_state.chunks = len(chunks)
+        st.session_state.chunk_count = len(chunks)
         st.session_state.pdf_loaded = True
 
     # ======================================================
@@ -179,7 +205,7 @@ with st.sidebar:
 
 <br>
 
-✂ Chunks : <b>{st.session_state.chunks}</b>
+✂ Chunks : <b>{st.session_state.chunk_count}</b>
 
 </div>
 """, unsafe_allow_html=True)
@@ -209,6 +235,14 @@ Database : <b>ChromaDB</b>
 
 </div>
 """, unsafe_allow_html=True)
+        
+        if st.session_state.document_insights:
+
+            st.divider()
+
+            st.subheader("📄 AI Insights")
+
+            st.info(st.session_state.document_insights)
 
         st.divider()
 
@@ -318,13 +352,25 @@ if question:
 
         with st.spinner("Thinking..."):
 
-            response = st.session_state.rag_chain.invoke(
+            if is_summary_request(question):
+
+                answer = summarize_document(
+                    st.session_state.document_chunks
+                )
+
+                response = None
+
+            else:
+
+                response = st.session_state.rag_chain.invoke(
                 {
                     "input": question
                 }
             )
 
-            answer = response["answer"]
+                answer = response["answer"]
+
+
 
         # Simple typing effect
 
@@ -342,16 +388,18 @@ if question:
         # Source Pages
         # -----------------------------
 
-        if "context" in response:
+        if response is not None and "context" in response:
+
+            st.markdown("### 📄 Sources")
 
             pages = sorted(
-                list(
-                    set(
-                        doc.metadata.get("page", 0) + 1
-                        for doc in response["context"]
-                    )
+                set(
+                    doc.metadata.get("page", 0) + 1
+                    for doc in response["context"]
                 )
             )
+
+            st.write(", ".join([f"Page {p}" for p in pages]))
 
             if pages:
 
@@ -364,12 +412,12 @@ if question:
                 for i, page in enumerate(pages):
                     cols[i].success(f"Page {page}")
 
-    st.session_state.messages.append(
-        {
-            "role": "assistant",
-            "content": answer
-        }
-    )
+        st.session_state.messages.append(
+            {
+                "role": "assistant",
+                "content": answer
+            }
+        )
 
 
 # ==========================================================

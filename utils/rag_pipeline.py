@@ -11,25 +11,26 @@ def create_rag_chain(retriever):
         temperature=0
     )
 
-    prompt = ChatPromptTemplate.from_template(
-        """
-You are a helpful AI assistant.
+    prompt = ChatPromptTemplate.from_template("""
+    You are an AI Research Assistant specialized in analyzing technical documents.
 
-Answer ONLY from the provided context.
+    Answer the user's question ONLY using the provided context.
 
-If the answer is not available in the context, simply reply:
+    Rules:
 
-"I don't know based on the uploaded document."
+    • Be concise and factual.
+    • If the answer spans multiple sections, combine the relevant information.
+    • If the context contains partial information, answer with the available details instead of saying "I don't know."
+    • Only reply "I couldn't find that information in the uploaded document." if none of the retrieved context is relevant.
 
-Context:
-{context}
+    Context:
+    {context}
 
-Question:
-{input}
+    Question:
+    {input}
 
-Answer:
-"""
-    )
+    Answer:
+    """)
 
     document_chain = create_stuff_documents_chain(
         llm,
