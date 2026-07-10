@@ -1,53 +1,57 @@
-# 📄 AI PDF Research Assistant (RAG)
+# 📄 RAG PDF Research Assistant
 
-An AI-powered **Retrieval-Augmented Generation (RAG)** application that enables users to upload PDF documents and interact with them using natural language. The application leverages **Llama 3.2**, **LangChain**, **HuggingFace Embeddings**, and **ChromaDB** to provide context-aware, document-grounded responses through a clean Streamlit interface.
+RAG PDF Research Assistant is an AI-powered document intelligence application that enables users to upload and interact with any text-based PDF document—including research papers, resumes, reports, manuals, project documentation, books, and technical documents—using natural language. The application combines Retrieval-Augmented Generation (RAG), LangChain, HuggingFace Embeddings, ChromaDB, and a locally hosted Llama 3.2 model to provide accurate, context-aware responses, document summarization, semantic search, and AI-generated document insights.
 
 ---
 
 ## 🚀 Features
 
-- 📄 Upload and process PDF documents
-- 💬 Ask natural language questions about uploaded PDFs
-- 🧠 Retrieval-Augmented Generation (RAG)
-- 🤖 Local LLM inference using **Llama 3.2 (Ollama)**
-- 🔍 Semantic search using HuggingFace embeddings
-- 💾 ChromaDB vector database for efficient retrieval
-- 📚 Context-aware document question answering
-- 📊 Displays document metadata (pages & chunks)
-- 💡 Suggested questions for quick interaction
-- 🎨 Clean and interactive Streamlit UI
+- 📄 Upload and analyze any text-based PDF document
+- 🤖 AI-powered document understanding using RAG
+- 💬 Natural language question answering
+- 📝 Intelligent document summarization
+- 🔍 Semantic search with vector embeddings
+- 📚 Context-aware responses grounded in document content
+- 📑 Source page references for generated answers
+- 💡 AI-generated document insights
+- 📊 Document statistics (pages & chunks)
 - 💬 Persistent chat history during the session
+- ⚡ Local inference using Ollama and Llama 3.2
+- 🎨 Modern and responsive Streamlit interface
 
 ---
 
 # 🏗️ System Architecture
 
 ```
-                PDF Document
-                     │
-                     ▼
-            PyPDF Document Loader
-                     │
-                     ▼
-         Recursive Text Splitter
-                     │
-                     ▼
-       HuggingFace Embeddings
-                     │
-                     ▼
-              Chroma Vector DB
-                     │
-                     ▼
-          Top-K Relevant Chunks
-                     │
-                     ▼
-            LangChain RAG Pipeline
-                     │
-                     ▼
-          Llama 3.2 (Ollama Local)
-                     │
-                     ▼
-              Final AI Response
+                    Upload PDF
+                         │
+                         ▼
+                   PyPDFLoader
+                         │
+                         ▼
+                  Text Cleaning
+                         │
+                         ▼
+              Recursive Chunking
+                         │
+                         ▼
+           HuggingFace Embeddings
+                         │
+                         ▼
+                  Chroma Vector DB
+                         │
+                         ▼
+              Top-K Similar Chunks
+                         │
+                         ▼
+             LangChain RAG Pipeline
+                         │
+                         ▼
+               Llama 3.2 (Ollama)
+                         │
+                         ▼
+                 AI Generated Answer
 ```
 
 ---
@@ -85,21 +89,20 @@ An AI-powered **Retrieval-Augmented Generation (RAG)** application that enables 
 | ChromaDB | Vector Database |
 | PyPDF | PDF Loading |
 | RecursiveCharacterTextSplitter | Document Chunking |
+| Sentence Transformers | Embedding Model |
 
 ---
 
 # 📂 Project Structure
 
 ```
-AI-PDF-Chatbot/
+RAG-PDF-Research-Assistant/
 │
 ├── app.py
 ├── config.py
 ├── requirements.txt
 ├── README.md
 ├── .gitignore
-│
-├── assets/
 │
 ├── data/
 │   └── sample.pdf
@@ -113,11 +116,15 @@ AI-PDF-Chatbot/
 │   └── style.css
 │
 └── utils/
-    ├── pdf_loader.py
-    ├── splitter.py
+    ├── cleaner.py
+    ├── document_insights.py
     ├── embeddings.py
-    ├── vector_store.py
-    └── rag_pipeline.py
+    ├── pdf_loader.py
+    ├── rag_pipeline.py
+    ├── router.py
+    ├── splitter.py
+    ├── summarizer.py
+    └── vector_store.py
 ```
 
 ---
@@ -125,13 +132,14 @@ AI-PDF-Chatbot/
 # 🔄 Workflow
 
 1. Upload a PDF document.
-2. Extract text using **PyPDFLoader**.
-3. Split the document into overlapping chunks.
-4. Generate semantic embeddings using **all-MiniLM-L6-v2**.
-5. Store embeddings in **ChromaDB**.
-6. Retrieve the most relevant chunks for a user query.
-7. Pass the retrieved context to **Llama 3.2** through LangChain.
-8. Generate a context-aware response.
+2. Extract text using PyPDFLoader.
+3. Clean and preprocess the extracted text.
+4. Split the document into overlapping chunks.
+5. Generate semantic embeddings using HuggingFace.
+6. Store embeddings in ChromaDB.
+7. Retrieve the most relevant chunks.
+8. Generate document-grounded responses using Llama 3.2.
+9. Display answers with source page references.
 
 ---
 
@@ -163,9 +171,9 @@ Generated Answer
 ## Clone Repository
 
 ```bash
-git clone https://github.com/<YOUR_GITHUB_USERNAME>/AI-PDF-Chatbot.git
+git clone https://github.com/Srikarsaitej/RAG-PDF-Research-Assistant.git
 
-cd AI-PDF-Chatbot
+cd RAG-PDF-Research-Assistant
 ```
 
 ---
@@ -229,41 +237,51 @@ streamlit run app.py
 # 💡 Example Questions
 
 - Summarize this document.
-- Explain the methodology.
-- What technologies are used?
+- Explain this document in simple terms.
+- What is the main objective?
 - List the key findings.
+- What technologies are mentioned?
 - Who are the authors?
-- What problem does this paper solve?
-- Explain the architecture.
 - Give me the conclusion.
+- Explain the methodology.
+- What skills are listed? (Resume)
+- What experience does the candidate have? (Resume)
+- What recommendations are made? (Report)
 
 ---
 
 # 📈 Future Improvements
 
-- Multiple PDF support
-- Conversation memory
-- PDF highlighting
-- Citation-based responses
+## 📈 Future Improvements
+
+- Multi-document support
+- Document comparison
+- AI-generated suggested questions
 - Chat export (PDF/Markdown)
-- Authentication
 - Cloud deployment
 - Docker support
-- Multi-user support
+- Authentication
+- Conversation memory
+- OCR support for scanned PDFs
 
 ---
 
 # 🎯 Skills Demonstrated
 
+## 🎯 Skills Demonstrated
+
 - Retrieval-Augmented Generation (RAG)
+- Large Language Models (LLMs)
 - Semantic Search
 - Vector Databases
 - Prompt Engineering
 - LangChain
-- Large Language Models
+- HuggingFace Embeddings
+- ChromaDB
+- Ollama
 - Streamlit Development
-- Local LLM Deployment
-- Python Application Development
+- AI Application Development
+- Python
 
 ---
 
