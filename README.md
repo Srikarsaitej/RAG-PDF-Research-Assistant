@@ -252,7 +252,6 @@ streamlit run app.py
 
 # 📈 Future Improvements
 
-## 📈 Future Improvements
 
 - Multi-document support
 - Document comparison
@@ -268,7 +267,6 @@ streamlit run app.py
 
 # 🎯 Skills Demonstrated
 
-## 🎯 Skills Demonstrated
 
 - Retrieval-Augmented Generation (RAG)
 - Large Language Models (LLMs)
